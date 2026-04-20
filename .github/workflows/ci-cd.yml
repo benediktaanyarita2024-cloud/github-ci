@@ -1,17 +1,24 @@
 name: CI/CD Pipeline
 
 on:
-push:
-branches: [ master ]
+  push:
+    branches: [ "master" ]
 
 jobs:
-build:
-runs-on: ubuntu-latest steps:
--	name: Checkout code uses: actions/checkout@v3
+  build:
+    runs-on: ubuntu-latest
 
--	name: Login ke Docker Hub uses: docker/login-action@v2 with:
-username: ${{ secrets.DOCKERHUB_USERNAME }} password: ${{ secrets.DOCKERHUB_TOKEN }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
 
--	name: Build dan Push Docker Image uses: docker/build-push-action@v4 with:
-context: . push: true
-tags: ${{ secrets.DOCKERHUB_USERNAME }}/github-ci:latest
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build Docker Image
+      run: docker build -t github-ci .
